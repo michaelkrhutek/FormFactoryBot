@@ -15,9 +15,10 @@ const data: IData[] = [
     {
         credentials: lenaCredentials,
         preferredClasses: [
-            { nameIncludes: 'BODYATTACK', weekday: Weekday.Monday, startTime:'18:45' },
             { nameIncludes: 'GRIT', weekday: Weekday.Tuesday, startTime:'17:30' },
-            { nameIncludes: 'CXWORX', weekday: Weekday.Tuesday, startTime:'18:15' }
+            { nameIncludes: 'BODYBALANCE', weekday: Weekday.Tuesday, startTime:'18:05' },
+            { nameIncludes: 'BODYJAM', weekday: Weekday.Tuesday, startTime:'19:10' },
+            { nameIncludes: 'BODYPUMP', weekday: Weekday.Thursday, startTime:'17:20' },
         ]
     }
 ];

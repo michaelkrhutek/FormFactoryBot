@@ -6,28 +6,45 @@ import getPreferredEvents from "./functions/get-preferred-events";
 import registerForEvent from "./functions/register-for-event";
 import { IData } from "./models/data.interface";
 import data from './data';
-import getCurrentWeekday from "./functions/get-weekday";
+import getWeekday from "./functions/get-weekday";
+import { OverallLog } from "./models/overall-log";
+import saveOverallLogToDb from "./functions/save-overall-log-to-db";
+import saveErrorLogToDb from "./functions/save-error-log-to-db";
 
-async function app(): Promise<any> {
-    console.log('App has started');
-    data.forEach(async (userData) => await loginAndRegisterForClasses(userData));
-    console.log('App has ended');
+async function app(wantedWeekday?: Weekday): Promise<OverallLog[] | null> {
+    try {
+        const weekday: Weekday = wantedWeekday || getWeekday();
+        const logs: OverallLog[] = await Promise.all(
+            data.map((userData) => loginAndRegisterForClasses(userData, weekday))
+        );
+        return logs;
+    } catch(err) {
+        await saveErrorLogToDb(err);
+        return null;
+    }
 }
 
-async function loginAndRegisterForClasses(userData: IData): Promise<void> {
+async function loginAndRegisterForClasses(userData: IData, weekday: Weekday): Promise<OverallLog> {
+    const log: OverallLog = new OverallLog(userData.credentials.username, weekday);
     try {
-        const weekday: Weekday = getCurrentWeekday();
+        log.preferredClasses = userData.preferredClasses;
         const events: IEvent[] = await getWeekdayEvents(weekday);
-        console.log(events);
+        log.eventsFound = events;
         const preferredEvents: IEvent[] = getPreferredEvents(events, userData.preferredClasses, weekday);
-        console.log(preferredEvents);
+        log.eventsMatchingPreferredClasses = preferredEvents;
         const cookie = await getAuthentificationCookie(userData.credentials);
-        console.log(cookie);
         if (cookie) {
-            preferredEvents.forEach(async (e) => await registerForEvent(e, userData.credentials.userId, cookie));
+            const registredEvents: IEvent[] = await Promise.all(
+                preferredEvents.map((e) => registerForEvent(e, userData.credentials.userId, cookie))
+            );
+            log.registredEvents = registredEvents.filter(e => e);
         }
+        return log;
     } catch(err) {
-        console.log(err);
+        log.error = err.toString();
+        return log;
+    } finally {
+        await saveOverallLogToDb(log);
     }
 }
 

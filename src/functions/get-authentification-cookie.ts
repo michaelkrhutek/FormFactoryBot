@@ -11,6 +11,7 @@ async function getAuthentificationCookie(userCredentials: IUserCredentials): Pro
         body: formData
     });
     return res.headers.get('set-cookie');
+
 }
 
 export default getAuthentificationCookie;

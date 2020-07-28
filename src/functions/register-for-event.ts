@@ -2,7 +2,7 @@ import { IEvent } from "../models/event-interface";
 import fetch from 'node-fetch';
 import FormData from 'form-data';
 
-async function registerForEvent(event: IEvent, userId: number, cookie: string): Promise<void> {
+async function registerForEvent(event: IEvent, userId: number, cookie: string): Promise<IEvent> {
     const headers: string[][] = [['cookie', cookie]];
     const formData: FormData = new FormData();
     formData.append('id', event.id.toString());
@@ -15,6 +15,7 @@ async function registerForEvent(event: IEvent, userId: number, cookie: string): 
         body: formData
     });
     console.log(res);
+    return event;
 }
 
 export default registerForEvent;

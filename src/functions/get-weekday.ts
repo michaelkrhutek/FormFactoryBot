@@ -1,7 +1,7 @@
 import { Weekday } from "../models/weekday-enum";
 
-function getCurrentWeekday(): Weekday {
-    return (new Date()).getDay() - 1;
+function getWeekday(): Weekday {
+    return ((new Date()).getDay() + 1) % 7;
 }
 
-export default getCurrentWeekday;
+export default getWeekday;

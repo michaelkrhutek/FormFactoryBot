@@ -9,28 +9,19 @@ function getPreferredEvents(allWeekdayEvents: IEvent[], allPreferences: IEventPr
 }
 
 function getDoesEventMatchPreferences(event: IEvent, preferences: IEventPreferenceInfo[]): boolean {
-    const minStartTime: string = getTimeAdjustedByMinutes(event.fromTime, -30);
-    const maxStartTime: string = getTimeAdjustedByMinutes(event.fromTime, 30);
+    const eventTimeInMinutes: number = getTimeInMinutes(event.fromTime);
     return preferences.some(preference => {
+        const preferenceTimeInMinutes: number = getTimeInMinutes(preference.startTime);
         if (!event.name.toLowerCase().includes(preference.nameIncludes.toLowerCase())) return false;
-        if (!Boolean(event.fromTime >= minStartTime)) return false;
-        if (!Boolean(event.fromTime <= maxStartTime)) return false;
+        if (!Boolean(eventTimeInMinutes >= preferenceTimeInMinutes - 30)) return false;
+        if (!Boolean(eventTimeInMinutes <= preferenceTimeInMinutes + 30)) return false;
         return true;
     });
 }
 
-function getTimeAdjustedByMinutes(time: string, addMinutes: number): string {
+function getTimeInMinutes(time: string): number {
     const [hours, minutes] = time.split(':').map(v => Number(v));
-    const totalMinutes: number = hours * 60 + minutes;
-    const newTotalMinutes: number = totalMinutes + addMinutes;
-    let newHours: number = Math.floor(newTotalMinutes / 60);
-    let newMinutes: number = newTotalMinutes % 60;
-    if (newMinutes == 60) {
-        newHours++;
-        newMinutes = 0;
-    }
-    newHours = newHours % 24;
-    return [newHours, newMinutes].map(v => String(v)).map(v => v.length == 1 ? `0${v}` : v).join(':');
+    return hours * 60 + minutes;
 }
 
 export default getPreferredEvents;
