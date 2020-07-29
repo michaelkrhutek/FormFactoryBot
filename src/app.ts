@@ -11,9 +11,9 @@ import { OverallLog } from "./models/overall-log";
 import saveOverallLogToDb from "./functions/save-overall-log-to-db";
 import saveErrorLogToDb from "./functions/save-error-log-to-db";
 
-async function app(wantedWeekday?: Weekday): Promise<OverallLog[] | null> {
+async function app(daysAheadFromToday: number = 1): Promise<OverallLog[] | null> {
     try {
-        const weekday: Weekday = wantedWeekday || getWeekday();
+        const weekday: Weekday = getWeekday(daysAheadFromToday);
         const logs: OverallLog[] = await Promise.all(
             data.map((userData) => loginAndRegisterForClasses(userData, weekday))
         );

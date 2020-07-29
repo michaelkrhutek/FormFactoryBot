@@ -1,7 +1,8 @@
 import { Weekday } from "../models/weekday-enum";
 
-function getWeekday(): Weekday {
-    return ((new Date()).getDay() + 1) % 7;
+function getWeekday(daysAheadFromToday: number): Weekday {
+    const verifiedDaysAheadFromToday: number = daysAheadFromToday % 7;
+    return ((new Date()).getDay() - 1 + verifiedDaysAheadFromToday) % 7;
 }
 
 export default getWeekday;

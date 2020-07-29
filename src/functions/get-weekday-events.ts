@@ -1,12 +1,13 @@
 import { IEvent } from "../models/event-interface";
-import axios from 'axios';
 import { JSDOM } from 'jsdom';
 import { Weekday } from "../models/weekday-enum";
 import getUpcomingDayDate from "./get-upcoming-day-date";
+import fetch from 'node-fetch';
 
 async function getWeekdayEvents(weekday: Weekday): Promise<IEvent[]> {
-    const res = await axios(`https://vinohradska.formfactory.cz/calendar?day=${getUpcomingDayDate(weekday)}`);
-    const dom = new JSDOM(res.data);
+    const res = await fetch(`https://vinohradska.formfactory.cz/calendar?day=${getUpcomingDayDate(weekday)}`);
+    const body = await res.text();
+    const dom = new JSDOM(body);
     const calendarTableElement = dom.window.document.getElementsByClassName('calendar_table')[0];
     const eventElements: HTMLCollectionOf<Element> = calendarTableElement
         .getElementsByTagName('tbody')[0]
